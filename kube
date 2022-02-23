@@ -37,7 +37,7 @@ B-	Execute below commands in both master & Node
 # Switch back to root
 -	sudo -i
 -	kubeadm config images pull
-# Replace this ip "172.31.46.214" on the below command with the private ip address of your master. You may also consider to change the ip address range of your pod-network if you want to.
+# Replace this ip "172.31.46.214" on the below command with the private ip address of your master. You may also consider changing the ip address range of your pod-network if you want to.
 -	kubeadm init --apiserver-advertise-address=172.31.46.214 --pod-network-cidr=192.168.0.0/16
 # After execution of the above command the screen will be populated with your token
 -	mkdir -p $HOME/.kube
