@@ -1,4 +1,6 @@
 Kubernetes Installation on Ubuntu
+
+# Important: *****Your instance must have at least 2 cpu & your RAM at least 1500 MG(t2.medium with 100GB storage will work)*****
 A-	Log into your instances 
 B-	Execute below commands in both master & Node
 
