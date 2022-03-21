@@ -1,0 +1,56 @@
+Kubernetes Installation on Ubuntu
+
+# Important: *****Your instance must have at least 2 cpu & your RAM at least 1500 MG(t2.medium with 100GB storage will work)*****
+A-	Log into your instances 
+B-	Execute below commands in both master & Node
+
+# Update your server
+-	sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+# Switch to root
+-	sudo -i  
+# Execute below commands as root
+-	sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+-	cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+        > deb https://apt.kubernetes.io/ kubernetes-xenial main
+        > EOF 
+-  apt-get update 
+
+# Disable Swap Memory for better performance
+-	swapoff -a
+-	sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+# Enable Iptables
+-	modprobe br_netfilter
+-	sysctl -p
+-	sudo sysctl net.bridge.bridge-nf-call-iptables=1
+# Docker Installation on both master & nodes
+-	apt install docker.io -y
+-	usermod -aG docker ubuntu
+-	ststemctl restart docker 
+-	systemctl enable docker.service
+# Exit or Switch to regular user
+# Install Kubernetes Module. You may elect to change the version. However, the latest version will not work
+-	sudo apt-get install -y kubelet=1.20.2-00 kubeadm=1.20.2-00 kubectl=1.20.2-00
+-	sudo apt-mark hold kubelet kubeadm kubectl
+-	sudo systemctl daemon-reload
+-	sudo systemctl start kubelet
+-	sudo systemctl enable kubelet.service
+-	sudo systemctl status docker
+# Steps below on Master only
+# Switch back to root
+-	sudo -i
+-	kubeadm config images pull
+# Replace this ip "172.31.46.214" on the below command with the private ip address of your master. You may also consider changing the ip address range of your pod-network if you want to.
+-	kubeadm init --apiserver-advertise-address=172.31.46.214 --pod-network-cidr=192.168.0.0/16
+# After execution of the above command the screen will be populated with your token
+-	mkdir -p $HOME/.kube
+-	sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+-	sudo chown $(id -u):$(id -g) $HOME/.kube/config
+# Execute the above token on your master
+# Install the Weave Net Add-On on your master
+-	kubectl apply -f https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')
+# Join the node to the master
+# Copy the last line of your token and run it on your node to connect node to master. It looks like this (yours will be different form this one). Don’t forget to put “sudo” 
+-	Sudo kubeadm join 172.31.28.192:6443 --token d3m6fk.s886rwfymhramrlx \ --discovery-token-ca-cert-hash sha256:7509e08bcc533be6c5631fa697b7ffc4b339ae10774146c1b9df64902048fa23 
+# Now run below commands on your master
+Kubectl get nodes  to see if your nodes are running
+Kubectl get pods –all-namespaces  to see all name spaces
